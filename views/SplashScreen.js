@@ -3,12 +3,12 @@ import { StyleSheet, Text, View, Image } from 'react-native'
 
 const SplashScreen = props => (
   <View style={styles.contianer}>
-    <Image style={styles.logo} source={require('../utils/images/logo.jpg')} />
+    <Image style={styles.logo} source={require('../utils/images/logo.png')} />
     <View style={{ marginBottom: 15 }}>
       <View style={styles.footer}>
         <Image
           style={styles.copywriteLogo}
-          source={require('../utils/images/flag.jpg')}
+          source={require('../utils/images/flag.png')}
         />
         <Text>حكومتي بخدمتي</Text>
       </View>
