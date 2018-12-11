@@ -1,44 +1,25 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, { Component } from 'react'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+
+import AppContainer from './views/AppContainer'
 import SplashScreen from './views/SplashScreen'
-import ScreenA from './views/ScreenA'
-import ScreenB from './views/ScreenB'
-import AboutUs from './views/AboutUs'
+export default class App extends Component {
+  state = {
+    splashScreen: true
+  }
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu'
-})
+  componentDidMount() {
+    setTimeout(() => this.setState({ splashScreen: false }), 2000)
+  }
 
-type Props = {}
-export default class App extends Component<Props> {
   render() {
-    return (
-      <View style={styles.container}>
-        {/* <SplashScreen /> */}
-        {/* <ScreenA /> */}
-        {/* <ScreenB /> */}
-        {/* <AboutUs /> */}
-      </View>
+    return this.state.splashScreen ? (
+      <SplashScreen
+        handleScreenClick={() => this.setState({ splashScreen: false })}
+      />
+    ) : (
+      <AppContainer
+        handleSkipClick={() => this.setState({ splashScreen: true })}
+      />
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff'
-  }
-})

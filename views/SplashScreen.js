@@ -1,20 +1,32 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableWithoutFeedback
+} from 'react-native'
 
 const SplashScreen = props => (
-  <View style={styles.contianer}>
-    <Image style={styles.logo} source={require('../utils/images/logo.png')} />
-    <View style={{ marginBottom: 15 }}>
-      <View style={styles.footer}>
-        <Image
-          style={styles.copywriteLogo}
-          source={require('../utils/images/flag.png')}
-        />
-        <Text>حكومتي بخدمتي</Text>
+  <TouchableWithoutFeedback onPress={props.handleScreenClick}>
+    <View style={styles.contianer}>
+      <Image style={styles.logo} source={require('../utils/images/logo.png')} />
+      <View style={{ marginBottom: 15 }}>
+        <View style={styles.footer}>
+          <Image
+            style={styles.copywriteLogo}
+            source={require('../utils/images/flag.png')}
+          />
+          <Text style={{ fontFamily: 'NotoKufiArabic_Regular' }}>
+            حكومتي بخدمتي
+          </Text>
+        </View>
+        <Text style={{ fontFamily: 'NotoKufiArabic_Regular', fontSize: 10 }}>
+          جميع الحقوق محفوظة © حكومتي بخدمتي
+        </Text>
       </View>
-      <Text>جميع الحقوق محفوظة © حكومتي بخدمتي</Text>
     </View>
-  </View>
+  </TouchableWithoutFeedback>
 )
 
 const styles = StyleSheet.create({

@@ -9,11 +9,42 @@ import {
   TouchableNativeFeedback
 } from 'react-native'
 import PhoneInput from 'react-native-phone-input'
+import phoneNumber from 'react-native-phone-input/lib/phoneNumber'
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default class ScreenA extends Component {
   state = {
-    value: ''
+    value: '+962 ',
+    validInput: false
   }
+
+  _handleInputChange = number => {
+    this.setState({ value: number })
+    this.phone.isValidNumber()
+      ? this.setState({ validInput: true })
+      : this.setState({ validInput: false })
+  }
+
+  _handlePhoneSubmit = () => {
+    // Generate A code
+    const genCode = parseInt(
+      Math.random()
+        .toString(10)
+        .substring(7)
+    )
+      .toString()
+      .slice(0, 5)
+
+    // Send Code as sms message
+    // Route to Phone Validiation Form View
+    const formattedPhoneNumber =
+      '(' + this.state.value.slice(0, 4) + ')' + this.state.value.slice(4)
+    this.props.navigation.navigate('PhoneValidationCode', {
+      validationCode: genCode,
+      phoneNumber: formattedPhoneNumber
+    })
+  }
+
   render() {
     return (
       <View style={styles.contianer}>
@@ -22,25 +53,44 @@ export default class ScreenA extends Component {
             color: '#585858',
             marginLeft: 275,
             marginBottom: 15,
-            fontSize: 16
+            fontSize: 14,
+            fontFamily: 'NotoKufiArabic_Regular'
           }}>
           رقم الهاتف
         </Text>
         <View style={styles.formContainer}>
-          <PhoneInput
+          <View
             style={{
-              width: 200,
-              marginTop: 20,
-              marginBottom: 15,
               flexDirection: 'row-reverse',
-              marginLeft: -100
-            }}
-            textStyle={{ color: '#585858', marginLeft: -10 }}
-            flagStyle={{ width: 38, height: 20 }}
-            initialCountry=""
-            ref="phone"
-            value="+962 "
-          />
+              width: 300,
+              alignItems: 'center'
+            }}>
+            <PhoneInput
+              onChangePhoneNumber={number => this._handleInputChange(number)}
+              style={{
+                flex: 8,
+                marginTop: 20,
+                marginBottom: 15,
+                marginRight: 50,
+                flexDirection: 'row-reverse'
+              }}
+              textStyle={{ color: '#585858', marginLeft: -10 }}
+              flagStyle={{ width: 38, height: 20 }}
+              initialCountry=""
+              ref={ref => {
+                this.phone = ref
+              }}
+              value={this.state.value}
+            />
+            {this.state.validInput && (
+              <MaterialCommunityIcon
+                style={{ flex: 1 }}
+                name="check-circle"
+                size={30}
+                color="#0054E8"
+              />
+            )}
+          </View>
           <View
             style={{ backgroundColor: '#585858', height: 0.5, width: 300 }}
           />
@@ -48,30 +98,40 @@ export default class ScreenA extends Component {
             style={{
               marginTop: 10,
               color: '#585858',
-              fontSize: 12
+              fontSize: 10,
+              fontFamily: 'NotoKufiArabic_Regular'
             }}>
             سنقوم بإرسال رسالة نصية للتحقق من الرقم
           </Text>
         </View>
         <TouchableNativeFeedback
-          onPress={this._onPressButton}
+          disabled={this.state.validInput ? false : true}
+          onPress={this._handlePhoneSubmit}
           background={TouchableNativeFeedback.SelectableBackground()}>
           <View
             style={{
-              marginTop: 12,
+              marginTop: 15,
               width: 350,
-              height: 50,
-              backgroundColor: '#146AFF',
+              height: 55,
+              backgroundColor: `${
+                this.state.validInput ? '#146AFF' : '#AEAEAE'
+              }`,
               borderRadius: 5,
               justifyContent: 'center',
               alignItems: 'center',
               elevation: 5
             }}>
-            <Text style={{ color: 'white', fontSize: 16 }}>ارسل</Text>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 16,
+                fontFamily: 'NotoKufiArabic_Regular'
+              }}>
+              ارسل
+            </Text>
           </View>
         </TouchableNativeFeedback>
-        <TouchableWithoutFeedback
-          onPress={this._onPressButton}
+        {/* <TouchableWithoutFeedback
           background={TouchableNativeFeedback.SelectableBackground()}>
           <View
             style={{
@@ -82,9 +142,9 @@ export default class ScreenA extends Component {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-            <Text style={{ color: '#585858', fontSize: 16 }}>تخطي</Text>
+            <Text style={{ color: '#585858', fontSize: 16, fontFamily: 'NotoKufiArabic_Regular' }}>تخطي</Text>
           </View>
-        </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback> */}
       </View>
     )
   }

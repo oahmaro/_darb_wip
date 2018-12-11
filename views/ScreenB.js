@@ -1,16 +1,63 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, View, TouchableNativeFeedback } from 'react-native'
-import PhoneInput from 'react-native-phone-input'
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableNativeFeedback,
+  TouchableWithoutFeedback
+} from 'react-native'
 import CodeInput from 'react-native-confirmation-code-input'
 
-export default class ScreenA extends Component {
+export default class ScreenB extends Component {
   state = {
+    phoneNumber: this.props.navigation.getParam('phoneNumber'),
     isValid: false,
-    code: '50018'
+    code: this.props.navigation.getParam('validationCode'),
+    resubmit: false,
+    seconds: 30
   }
 
-  onFullFill = isValid => {
+  _tick = () => {
+    if (this.state.seconds !== 0) {
+      this.setState(prevState => ({ seconds: prevState.seconds - 1 }))
+    } else this.setState({ resubmit: true })
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(() => this._tick(), 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  _onFullFill = isValid => {
     isValid ? this.setState({ isValid }) : alert('Invalid Code')
+  }
+
+  _handleCodeSubmit = () =>
+    this.props.navigation.navigate('RegistrationForm', {
+      phoneNumber: this.state.phoneNumber
+    })
+
+  _handleCodeResubmit = () => {
+    // Generate A code
+    let genCode = parseInt(
+      Math.random()
+        .toString(10)
+        .substring(7)
+    )
+      .toString()
+      .slice(0, 5)
+    // Set code state to the new generated code
+    this.setState({
+      code: genCode,
+      seconds: 30,
+      resubmit: false,
+      isValid: false
+    })
+    // send sms message
+    // Code goes here
   }
 
   render() {
@@ -25,7 +72,7 @@ export default class ScreenA extends Component {
           }}>
           <Text
             style={{
-              fontWeight: '800',
+              fontFamily: 'NotoKufiArabic_Bold',
               fontSize: 22,
               color: '#585858'
             }}>
@@ -33,8 +80,8 @@ export default class ScreenA extends Component {
           </Text>
           <Text
             style={{
-              marginTop: 50,
-              fontWeight: '100',
+              marginTop: 35,
+              fontFamily: 'NotoKufiArabic_Regular',
               fontSize: 16,
               color: '#585858'
             }}>
@@ -42,18 +89,19 @@ export default class ScreenA extends Component {
           </Text>
           <Text
             style={{
-              fontWeight: '800',
+              fontFamily: 'NotoKufiArabic_Bold',
               fontSize: 22,
               color: '#585858'
             }}>
-            (+962) 796258965
+            {this.state.phoneNumber}
           </Text>
         </View>
         <View
           style={{
             alignItems: 'center',
             height: 300,
-            width: '100%'
+            width: '100%',
+            marginTop: 10
           }}>
           <CodeInput
             space={12}
@@ -65,7 +113,7 @@ export default class ScreenA extends Component {
             autoFocus={false}
             ignoreCase={true}
             inputPosition="center"
-            onFulfill={(isValid, code) => this.onFullFill(isValid)}
+            onFulfill={(isValid, code) => this._onFullFill(isValid)}
             onChange={() => this.setState({ isValid: false })}
             containerStyle={{ maxHeight: 65 }}
             codeInputStyle={{ borderWidth: 1.5 }}
@@ -80,18 +128,40 @@ export default class ScreenA extends Component {
               fontSize: 22
             }}
           />
-          <Text style={{ marginTop: 20 }}>
-            إعادة ارسال رمز التحقق خلال 0:30
-          </Text>
+          <View
+            style={{
+              flexDirection: 'row-reverse',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 20
+            }}>
+            <TouchableWithoutFeedback
+              disabled={this.state.resubmit ? false : true}
+              onPress={this._handleCodeResubmit}>
+              <Text
+                style={{
+                  color: `${this.state.resubmit ? '#0054E8' : '#585858'}`,
+                  fontFamily: 'NotoKufiArabic_Regular'
+                }}>
+                إعادة ارسال رمز التحقق خلال
+              </Text>
+            </TouchableWithoutFeedback>
+            <Text style={{ fontWeight: '800', marginRight: 10 }}>
+              {this.state.seconds < 10
+                ? '0:0' + this.state.seconds
+                : '0:' + this.state.seconds}
+            </Text>
+          </View>
+
           <TouchableNativeFeedback
             disabled={this.state.isValid ? false : true}
-            onPress={this._onPressButton}
+            onPress={this._handleCodeSubmit}
             background={TouchableNativeFeedback.SelectableBackground()}>
             <View
               style={{
                 width: 350,
                 height: 55,
-                marginTop: 45,
+                marginTop: 35,
                 backgroundColor: `${
                   this.state.isValid ? '#146AFF' : '#AEAEAE'
                 }`,
@@ -100,11 +170,17 @@ export default class ScreenA extends Component {
                 alignItems: 'center',
                 elevation: 5
               }}>
-              <Text style={{ color: 'white', fontSize: 16, fontWeight: '800' }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 16,
+                  fontFamily: 'NotoKufiArabic_Regular'
+                }}>
                 استمرار
               </Text>
             </View>
           </TouchableNativeFeedback>
+          <Text style={{ marginTop: 20 }}>{this.state.code}</Text>
         </View>
       </View>
     )

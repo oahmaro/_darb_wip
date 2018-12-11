@@ -6,7 +6,8 @@ import {
   TouchableNativeFeedback,
   TouchableWithoutFeedback,
   Button,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import DateTimePicker from 'react-native-modal-datetime-picker'
@@ -19,7 +20,9 @@ export default class ScreenC extends Component {
     male: false,
     female: false,
     isValidName: false,
-    isDateTimePickerVisible: false
+    isValidDate: false,
+    isDateTimePickerVisible: false,
+    accessToken: ''
   }
 
   _showDateTimePicker = () => {
@@ -33,13 +36,45 @@ export default class ScreenC extends Component {
   }
 
   _handleDatePicked = date => {
-    this.setState({ date: moment(date).format('YYYY/MM/DD') })
+    this.setState({
+      date: moment(date).format('YYYY/MM/DD'),
+      isValidDate: true
+    })
     this._hideDateTimePicker()
   }
 
   _handleButtonClick = obj => {
     this.setState(obj)
     this.refs.inputName.blur()
+  }
+
+  _handleInputChange = text => {
+    // Get list of users from database
+    // set state name value to user input
+    this.setState({ name: text, isValidName: true })
+    // check if name is in list
+    // set state isValidName value
+  }
+
+  _handleFormSubmit = () => {
+    // Check if all fields are filled with valid data
+    const { isValidName, male, female, date, accessToken, name } = this.state
+    if (isValidName && (male || female)) {
+      // Send signup form to backend
+      // once approved recive a token
+      // route to next screen with token passed as props
+      this.props.navigation.navigate('WelcomScreen', {
+        accessToken: accessToken,
+        user: {
+          name: name,
+          sex: (male && 'male') || (female && 'female'),
+          birthDate: date,
+          phoneNumber: this.props.navigation.getParam('phoneNumber')
+        }
+      })
+    } else {
+      Alert.alert('Invalid form', 'Make sure all fields are filled')
+    }
   }
 
   render() {
@@ -94,6 +129,8 @@ export default class ScreenC extends Component {
                 الاسم
               </Text>
               <TextInput
+                onChangeText={this._handleInputChange}
+                value={this.state.name}
                 ref="inputName"
                 style={{
                   fontFamily: 'NotoKufiArabic_Regular',
@@ -188,6 +225,7 @@ export default class ScreenC extends Component {
           </TouchableNativeFeedback>
         </View>
         <TouchableNativeFeedback
+          onPress={this._handleFormSubmit}
           background={TouchableNativeFeedback.SelectableBackground()}>
           <View
             style={{
