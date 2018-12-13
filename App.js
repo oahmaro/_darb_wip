@@ -1,25 +1,35 @@
 import React, { Component } from 'react'
+import { View } from 'react-native'
+import AppContainer from './src/components/AppContainer'
+import SplashScreen from './src/views/SplashScreen'
 
-import AppContainer from './views/AppContainer'
-import SplashScreen from './views/SplashScreen'
-export default class App extends Component {
-  state = {
-    splashScreen: true
-  }
+import { connect } from 'react-redux'
+import { handleInitialData } from './src/actions/shared'
 
+import ScreenE from './src/views/ScreenE'
+import PrivacyPolicy from './src/views/PrivacyPolicy'
+import AboutUs from './src/views/AboutUs'
+import ComplaintsNotes from './src/views/ComplaintsNotes'
+import FeedBack from './src/components/FeedBack'
+import RepeatTrip from './src/components/RepeatTrip'
+import Map from './src/components/Map'
+
+class App extends Component {
   componentDidMount() {
-    setTimeout(() => this.setState({ splashScreen: false }), 2000)
+    this.props.dispatch(handleInitialData)
   }
-
   render() {
-    return this.state.splashScreen ? (
-      <SplashScreen
-        handleScreenClick={() => this.setState({ splashScreen: false })}
-      />
-    ) : (
-      <AppContainer
-        handleSkipClick={() => this.setState({ splashScreen: true })}
-      />
+    return (
+      <View style={{ flex: 1, width: '100%' }}>
+        <Map />
+        <FeedBack />
+      </View>
     )
   }
 }
+
+function mapStateToProps({ user }) {
+  return {}
+}
+
+export default connect()(App)
